@@ -1,19 +1,24 @@
 * Post Test Lab 3
 
-*1. Buatlah logfile sebelum memulai project STATA-mu! (0%).
-cd "C:\Users\ThinkPad\iCloudDrive\"
-global log "C:\Users\ThinkPad\iCloudDrive\Stata_Hisbi\log"
-global output "C:\Users\ThinkPad\iCloudDrive\Stata_Hisbi\output\ts"
-global data "C:\Users\ThinkPad\iCloudDrive\Stata_Hisbi\data\ts"
+/*
+1. Buatlah logfile sebelum memulai project STATA-mu! (0%).
+*/
 
-*2. Masukkan data m1 yang sudah didownload, set waktu time-seriesnya dari kuartal 1 tahun 1980! (5%).
-use "C:\Users\ThinkPad\iCloudDrive\Stata_Hisbi\data\ts\m1.dta"
+global output "C:\Users\hisbi\OneDrive\Documents\GitHub\stata-tutorial\Time Series\output"
+global data "C:\Users\hisbi\OneDrive\Documents\GitHub\stata-tutorial\Time Series\data"
+
+/*
+2. Masukkan data m1 yang sudah didownload, set waktu time-seriesnya dari kuartal 1 tahun 1980! (5%).
+*/
+use "$data/m1.dta", clear
 gen quarter=tq(1980q1)+_n-1
 format quarter %tq
 tsset quarter, quarterly
-br
 
-*3. Lakukan uji stasioneritas pada variabel m1 dengan tingkat signifikansi 5% (5%).
+/*
+3. Lakukan uji stasioneritas pada variabel m1 dengan tingkat signifikansi 5% (5%).
+*/
+
 tsline m1
 * Belum stationer dalam bentuk grafiknya
 * ADF Test
@@ -33,12 +38,19 @@ tsline m1
 * Hasil
 * 0.0000 < 0.05
 * Dengan tingkat signfikansi 5%, variabel m1 sudah stasioner di tingkat turunan pertama
+
 tsline d.m1
 
-*4.	Lakukan pengecekan dengan correlogram variabel m1 (mempertimbangkan asumsi stasioneritas) untuk menentukan model dan ordo yang mungkin dapat dipakai! (15%)
+/*
+4.	Lakukan pengecekan dengan correlogram variabel m1 (mempertimbangkan asumsi stasioneritas) untuk menentukan model dan ordo yang mungkin dapat dipakai! (15%)
+*/
+
 corrgram d.m1
 
-* 5.	Tuliskan Hipotesis dan Uji kriteria pada uji stasioner Augmented Dickey Fuller (ADF) test terhadap residual dan Uji White Noise! (5%)
+/*
+5.	Tuliskan Hipotesis dan Uji kriteria pada uji stasioner Augmented Dickey Fuller (ADF) test terhadap residual dan Uji White Noise! (5%)
+*/
+
 * ADF Test
 * Hipotesis
 * H0 : Variabel tidak stasioner (mengandung unit root)
@@ -55,7 +67,10 @@ corrgram d.m1
 * P. Value < α: H0 ditolak
 * P. Value > α: H0 tidak dapat ditolak
 
-*6.	Lakukan regresi dari model AR, MA dan ARMA di turunan pertama. Juga coba model yang tidak menggunakan konstanta sehingga kamu punya 4 model (ex: model yang kamu estimasi pertama adalah AR sehingga model tersebut yang dijadikan pilihan tanpa konstanta sebagai model ke-4). Jangan lupa untuk melakukan uji asumsi whitenoise, uji deteksi stasioner untuk residual model, dan juga catat hasil AIC, BIC, dan LLnya (30%).
+/*
+6.	Lakukan regresi dari model AR, MA dan ARMA di turunan pertama. Juga coba model yang tidak menggunakan konstanta sehingga kamu punya 4 model (ex: model yang kamu estimasi pertama adalah AR sehingga model tersebut yang dijadikan pilihan tanpa konstanta sebagai model ke-4). Jangan lupa untuk melakukan uji asumsi whitenoise, uji deteksi stasioner untuk residual model, dan juga catat hasil AIC, BIC, dan LLnya (30%).
+*/
+
 * AR(1)
 arima d.m1, arima(1,0,0)nolog
 predict ar1,r
@@ -112,10 +127,14 @@ estat ic
 * AIC = 1036.93
 * LL = -516.465
 
-*7.	Identifikasi satu model yang terbaik untuk dipergunakan memprediksi nilai m1 dari antara 4 kemungkinan model tersebut (10%).
+/*
+7.	Identifikasi satu model yang terbaik untuk dipergunakan memprediksi nilai m1 dari antara 4 kemungkinan model tersebut (10%).
+*/
 * Model ARMA(1) sesuai kriteria AIC BIC terkecil dan LL terbesar 
 
-*8.	Setelah mendapatkan model terbaik, lakukan prediksi 1 kuartal dan 5 kuartal kedepan (statis dan dinamis) dan gambarkan grafiknya! (20%)
+/*
+8.	Setelah mendapatkan model terbaik, lakukan prediksi 1 kuartal dan 5 kuartal kedepan (statis dan dinamis) dan gambarkan grafiknya! (20%)
+*/
 tsappend, last (2020q4)tsfmt(tq)
 arima d.m1, arima (1,0,1) nolog
 
@@ -129,7 +148,10 @@ Dinamis
 predict dinamis, dynamic(tq(2019q3))y
 tsline dinamis m1
 
-*9.	Lakukan uji Theil's U Stat untuk melihat apakah model sudah bisa memprediksi dengan baik! (10%).
+/*
+9.	Lakukan uji Theil's U Stat untuk melihat apakah model sudah bisa memprediksi dengan baik! (10%).
+*/
+
 ssc install fcstats
 fcstats m1 statis
 fcstats m1 dinamis
